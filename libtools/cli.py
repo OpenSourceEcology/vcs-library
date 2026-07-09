@@ -10,6 +10,7 @@ from typing import Sequence
 
 from libtools.code_validator import validate_code
 from libtools import compile_entry
+from libtools.export_json import export_entry
 from libtools.registry import RegistryError, discover
 from libtools.report import write_report
 
@@ -55,6 +56,13 @@ def _build_parser() -> argparse.ArgumentParser:
     compile_parser.add_argument("--out-dir", type=Path)
     compile_parser.add_argument("id")
     compile_parser.set_defaults(func=_compile_command)
+
+    export_json_parser = subparsers.add_parser("export-json")
+    export_json_parser.add_argument("--root", type=Path, default=Path("."))
+    export_json_parser.add_argument("--out-dir", type=Path)
+    export_json_parser.add_argument("--all", action="store_true")
+    export_json_parser.add_argument("ids", nargs="*")
+    export_json_parser.set_defaults(func=_export_json_command)
 
     return parser
 
@@ -135,6 +143,25 @@ def _compile_command(args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
         return 2
+
+
+def _export_json_command(args: argparse.Namespace) -> int:
+    selected = _select_entries(args.root, args.all, args.ids)
+    if isinstance(selected, int):
+        return selected
+
+    out_dir = args.out_dir if args.out_dir is not None else args.root / "exported"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    for entry in selected:
+        path = out_dir / f"{entry.id}.json"
+        path.write_text(
+            json.dumps(export_entry(entry), indent=2, sort_keys=False) + "\n",
+            encoding="utf-8",
+        )
+        print(f"EXPORT {entry.id} {path}")
+
+    return 0
 
 
 def _select_entries(root: Path, all_entries: bool, ids: Sequence[str]):
