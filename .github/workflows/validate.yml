@@ -1,0 +1,15 @@
+# Fast lane: toolkit tests + tier-1 code validation on every push.
+# Output (geometry) validation needs FreeCAD and runs in output-validate.yml.
+name: validate
+on: [push, pull_request]
+jobs:
+  code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e '.[dev]'
+      - run: pytest -q
+      - run: python -m libtools validate-code --root . --all
