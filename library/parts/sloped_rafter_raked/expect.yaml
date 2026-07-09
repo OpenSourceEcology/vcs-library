@@ -1,0 +1,40 @@
+envelope:
+  bbox_in:
+    x: [-0.05, 8.05]
+    y: [-24.0, 168.0]
+    z: [6.0, 59.75]
+  tolerance_in: 0.5
+solids:
+  min_count: 1
+  roles:
+    - pattern: "Roof_Rafter_*"
+      count: 1
+    - pattern: "Reference_*"
+      count: 3
+overlap:
+  tolerance_in3: 0.01
+  allowed_contact:
+    - ["Reference_*", "Roof_Rafter_*"]
+params:
+  - key: birdsmouth_depth_in
+    min: 0
+    max: 1.375
+  - key: front_back_wall_depth_in
+    min: 0.1
+    max: 71
+  - key: building_depth_in
+    min: 1
+  - key: building_width_in
+    min: 1
+  - key: front_height_in
+    min: 0
+  - key: back_height_in
+    min: 0
+  - key: front_overhang_in
+    min: 0
+  - key: back_overhang_in
+    min: 0
+  - key: minimum_bearing_in
+    min: 0
+  - key: reference_line_size_in
+    min: 0

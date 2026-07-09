@@ -1,0 +1,17 @@
+id: sloped_rafter_flat_top_plate
+layer: part
+title: Single sloped roof rafter with corrected birdsmouth cuts
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: wip
+provenance:
+  author: Catarina
+  drive_file_id: 1w3lYM91nQGXfxmfaE55_9a0fht3rT1Xw
+  original_filename: "WIP VCS Schema - Part - Sloped Rafter for Flat Top Plate.py"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null

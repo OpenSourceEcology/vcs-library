@@ -1,0 +1,17 @@
+id: sloped_rafter_raked
+layer: part
+title: Single sloped roof rafter with raked-wall birdsmouth cuts
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Catarina
+  drive_file_id: 14dGJB56dhJSRdku7eya-_54bknKY-IX6
+  original_filename: "VCS Schema - Part - Sloped Rafter for Sloped Top Plate.py"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null
