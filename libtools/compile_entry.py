@@ -7,6 +7,12 @@ import traceback
 from pathlib import Path
 from types import ModuleType
 
+# freecadcmd executes this file as a script with an embedded interpreter that
+# ignores PYTHONPATH, so the package parent must be put on sys.path here.
+_PACKAGE_PARENT = str(Path(__file__).resolve().parent.parent)
+if _PACKAGE_PARENT not in sys.path:
+    sys.path.insert(0, _PACKAGE_PARENT)
+
 from libtools.geometry_checks import ShapeInfo
 from libtools.output_validator import failure_report, validate_output
 from libtools.registry import Entry, discover, load_schema
