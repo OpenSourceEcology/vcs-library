@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vcs-library — validated parts for the Village Construction Set</title>
+<meta name="description" content="The canonical part library for the OSE Village Construction Set: schemas, compilers, and validators for every entry.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fbfaf7;--ink:#21201c;--graphite:#8a8578;--lumber:#e9d8a6;--rev:#b3391f;--hair:#d8d4c8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.65 "IBM Plex Sans",-apple-system,sans-serif}
+a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+a:hover{color:var(--rev)}
+.wrap{max-width:880px;margin:0 auto;padding:0 24px}
+.hdr{border-bottom:1.5px solid var(--ink)}
+.hdr .wrap{display:flex;gap:1rem;align-items:baseline;padding:14px 24px;font:500 13px/1 "IBM Plex Mono",monospace;letter-spacing:.08em}
+.hdr .org{color:var(--graphite);margin-left:auto}
+h1{font:700 clamp(1.9rem,5vw,2.9rem)/1.12 "IBM Plex Sans",sans-serif;letter-spacing:-.01em;margin:2.6rem 0 1rem}
+.lede{font-size:1.1rem;max-width:60ch;color:#3c3a33}
+h2{font:600 13px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite);margin:2.8rem 0 1rem;padding-top:1rem;border-top:1px solid var(--hair)}
+p.body{max-width:64ch;margin-bottom:1rem}
+.anatomy{margin:1.6rem 0}
+.anatomy svg{width:100%;height:auto;display:block}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.2rem 0}
+.card{border:1px solid var(--hair);background:#fff;padding:1rem 1.1rem}
+.card b{display:block;font-weight:600;margin-bottom:.25rem}
+.card span{font-size:.92rem;color:#4a473e}
+.card .lbl{font:500 11px "IBM Plex Mono",monospace;color:var(--graphite);letter-spacing:.1em;display:block;margin-bottom:.5rem}
+.tblock{margin-top:3.4rem;border:1.5px solid var(--ink)}
+.tblock table{width:100%;border-collapse:collapse;font:12px/1.5 "IBM Plex Mono",monospace}
+.tblock td{border:1px solid var(--ink);padding:.5rem .8rem;vertical-align:top}
+.tblock .lbl{display:block;font-size:9.5px;letter-spacing:.12em;color:var(--graphite)}
+footer{padding:0 0 3rem}
+</style>
+</head>
+<body>
+<div class="hdr"><div class="wrap"><span>VCS-LIBRARY</span><span class="org">OPEN SOURCE ECOLOGY</span></div></div>
+<main class="wrap">
+
+<h1>Parts that carry their own proof.</h1>
+<p class="lede">vcs-library is the part library for the
+<a href="https://wiki.opensourceecology.org/wiki/Village_Construction_Set">Village Construction Set</a>
+12-foot modules — rafters, wall modules, ceilings, cabin assemblies, designed
+by Catarina. Every entry ships with the code that builds it and the
+validators that judge it.</p>
+
+<h2>The anatomy of an entry</h2>
+<div class="anatomy">
+<svg viewBox="0 0 860 190" role="img" aria-label="Diagram: a schema and compiler produce a FreeCAD output; a code validator checks the schema and a geometry validator checks the output; a bill of materials and fabrication drawing are generated from the output">
+<g font-family="IBM Plex Mono,monospace" font-size="13" fill="#21201c">
+  <rect x="10" y="30" width="150" height="52" fill="#fff" stroke="#21201c"/>
+  <text x="85" y="52" text-anchor="middle">schema.py</text>
+  <text x="85" y="70" text-anchor="middle" font-size="10" fill="#8a8578">the parameters</text>
+  <rect x="10" y="108" width="150" height="52" fill="#fff" stroke="#21201c"/>
+  <text x="85" y="130" text-anchor="middle">compiler.py</text>
+  <text x="85" y="148" text-anchor="middle" font-size="10" fill="#8a8578">the geometry</text>
+  <line x1="160" y1="56" x2="250" y2="90" stroke="#21201c"/>
+  <line x1="160" y1="134" x2="250" y2="100" stroke="#21201c"/>
+  <rect x="250" y="69" width="160" height="52" fill="#e9d8a6" stroke="#21201c"/>
+  <text x="330" y="91" text-anchor="middle">output.FCStd</text>
+  <text x="330" y="109" text-anchor="middle" font-size="10" fill="#6b5f3e">compiled in FreeCAD</text>
+  <line x1="410" y1="95" x2="490" y2="95" stroke="#21201c"/>
+  <rect x="490" y="12" width="170" height="46" fill="#fff" stroke="#b3391f"/>
+  <text x="575" y="31" text-anchor="middle" fill="#b3391f">code validator</text>
+  <text x="575" y="47" text-anchor="middle" font-size="10" fill="#8a8578">units · ranges · discipline</text>
+  <rect x="490" y="72" width="170" height="46" fill="#fff" stroke="#b3391f"/>
+  <text x="575" y="91" text-anchor="middle" fill="#b3391f">output validator</text>
+  <text x="575" y="107" text-anchor="middle" font-size="10" fill="#8a8578">complete · no overlap · fits</text>
+  <rect x="490" y="132" width="170" height="46" fill="#fff" stroke="#21201c"/>
+  <text x="575" y="151" text-anchor="middle">generated docs</text>
+  <text x="575" y="167" text-anchor="middle" font-size="10" fill="#8a8578">BOM · fab drawing</text>
+  <line x1="85" y1="30" x2="85" y2="20" stroke="#21201c"/>
+  <line x1="85" y1="20" x2="490" y2="20" stroke="#21201c" stroke-dasharray="4 4"/>
+  <line x1="410" y1="110" x2="490" y2="150" stroke="#21201c"/>
+  <rect x="700" y="69" width="150" height="52" fill="#fff" stroke="#21201c"/>
+  <text x="775" y="91" text-anchor="middle">PASS / FAIL</text>
+  <text x="775" y="109" text-anchor="middle" font-size="10" fill="#8a8578">on every change, in CI</text>
+  <line x1="660" y1="35" x2="700" y2="85" stroke="#21201c"/>
+  <line x1="660" y1="95" x2="700" y2="95" stroke="#21201c"/>
+</g>
+</svg>
+</div>
+<p class="body">An entry is four files: the schema (parameters as plain data),
+the compiler (Python that builds the geometry in FreeCAD), metadata naming its
+author and owner, and the expectations its geometry must meet. Two validators
+run in CI on every change — one reads the code, one inspects the compiled
+result for completeness, overlap, and fit. A bill of materials and a
+fabrication drawing are generated from the same compile, so the documents can
+never drift from the design. The structure follows the
+<a href="https://wiki.opensourceecology.org/wiki/Schema_Canon">Schema Canon</a>,
+and the toolkit (<code>libtools</code>) is library-agnostic: the next
+construction set — tractors, printers, vehicles — reuses it unchanged.</p>
+
+<h2>Go to</h2>
+<div class="links">
+  <div class="card"><span class="lbl">BROWSE</span><b><a href="https://opensourceecology.github.io/ose-library-site/">The library, rendered</a></b><span>Every entry with its 3D model, drawing, BOM, and validation status.</span></div>
+  <div class="card"><span class="lbl">SOURCE</span><b><a href="https://github.com/OpenSourceEcology/vcs-library">github.com/OpenSourceEcology/vcs-library</a></b><span>Entries, toolkit, and the docs: governance, ontology, contributing.</span></div>
+  <div class="card"><span class="lbl">AUTHOR IN FREECAD</span><b><a href="https://opensourceecology.github.io/ose-library-workbench/">Library Workbench</a></b><span>Browse, compile, edit, and validate entries inside FreeCAD.</span></div>
+  <div class="card"><span class="lbl">DESIGN A HOUSE</span><b><a href="https://iconic-cad.goodancestor.com">Iconic CAD</a></b><span>The layout editor these libraries feed.</span></div>
+</div>
+
+<footer>
+<div class="tblock"><table>
+<tr>
+  <td style="width:34%"><span class="lbl">PROJECT</span>VCS-LIBRARY — VILLAGE CONSTRUCTION SET</td>
+  <td style="width:22%"><span class="lbl">ORG</span>OPEN SOURCE ECOLOGY</td>
+  <td style="width:22%"><span class="lbl">DESIGN AUTHOR</span>CATARINA</td>
+  <td style="width:22%"><span class="lbl">LICENSE</span>OSE / CC-BY-SA-4.0</td>
+</tr>
+<tr>
+  <td><span class="lbl">SOURCE</span><a href="https://github.com/OpenSourceEcology/vcs-library">github.com/OpenSourceEcology/vcs-library</a></td>
+  <td><span class="lbl">WIKI</span><a href="https://wiki.opensourceecology.org">wiki.opensourceecology.org</a></td>
+  <td><span class="lbl">DEVELOPED BY</span><a href="https://goodancestor.com">GOOD ANCESTOR FOUNDATION</a></td>
+  <td><span class="lbl">ENTRIES</span>12 — PARTS · MODULES · ASSEMBLIES</td>
+</tr>
+</table></div>
+</footer>
+</main>
+</body>
+</html>
