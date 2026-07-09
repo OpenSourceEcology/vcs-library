@@ -65,6 +65,13 @@ def run(root: str, entry_id: str, out_dir: str, reports_dir: str) -> int:
         entries_by_id = {candidate.id: candidate for candidate in entries}
         entry = entries_by_id[entry_id]
 
+        # Compilers may import shared packages that live at the library root
+        # (repo-local helper libraries). PYTHONPATH is ignored under
+        # freecadcmd, so the root goes on sys.path here.
+        root_str = str(root_path.resolve())
+        if root_str not in sys.path:
+            sys.path.insert(0, root_str)
+
         schema = load_schema(entry)
         compiler = _load_compiler(entry.compiler_path)
 
