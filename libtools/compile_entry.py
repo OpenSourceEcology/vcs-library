@@ -86,6 +86,10 @@ def run(root: str, entry_id: str, out_dir: str, reports_dir: str) -> int:
         else:
             failed_count = sum(1 for check in report.checks if not check.passed)
             print(f"FAIL {entry.id} ({failed_count} failed checks)")
+            for check in report.checks:
+                if not check.passed:
+                    detail = check.detail or "(no detail)"
+                    print(f"  {check.name}: {detail[:400]}")
 
         if os.environ.get("LIBTOOLS_SLOTS") == "1" and report.passed:
             from libtools.bom import write_bom_csv
