@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Sequence
 
 from libtools.code_validator import validate_code
+from libtools import compile_entry
 from libtools.registry import RegistryError, discover
 from libtools.report import write_report
 
@@ -38,37 +42,28 @@ def _build_parser() -> argparse.ArgumentParser:
     validate_code_parser.add_argument("ids", nargs="*")
     validate_code_parser.set_defaults(func=_validate_code_command)
 
+    validate_output_parser = subparsers.add_parser("validate-output")
+    validate_output_parser.add_argument("--root", type=Path, default=Path("."))
+    validate_output_parser.add_argument("--reports-dir", type=Path)
+    validate_output_parser.add_argument("--out-dir", type=Path)
+    validate_output_parser.add_argument("--all", action="store_true")
+    validate_output_parser.add_argument("ids", nargs="*")
+    validate_output_parser.set_defaults(func=_validate_output_command)
+
+    compile_parser = subparsers.add_parser("compile")
+    compile_parser.add_argument("--root", type=Path, default=Path("."))
+    compile_parser.add_argument("--out-dir", type=Path)
+    compile_parser.add_argument("id")
+    compile_parser.set_defaults(func=_compile_command)
+
     return parser
 
 
 def _validate_code_command(args: argparse.Namespace) -> int:
-    if args.all and args.ids:
-        print("cannot combine --all with explicit IDs", file=sys.stderr)
-        return 2
-    if not args.all and not args.ids:
-        print("must pass --all or at least one ID", file=sys.stderr)
-        return 2
-
-    root = args.root
-    if not root.is_dir():
-        print(f"bad root: {root}", file=sys.stderr)
-        return 2
-    if not (root / "library").is_dir():
-        print(f"bad root: {root} has no library directory", file=sys.stderr)
-        return 2
-
-    reports_dir = args.reports_dir if args.reports_dir is not None else root / "reports"
-    entries = discover(root)
-    entries_by_id = {entry.id: entry for entry in entries}
-
-    if args.all:
-        selected = entries
-    else:
-        unknown = [entry_id for entry_id in args.ids if entry_id not in entries_by_id]
-        if unknown:
-            print(f"unknown id: {unknown[0]}", file=sys.stderr)
-            return 2
-        selected = [entries_by_id[entry_id] for entry_id in args.ids]
+    selected = _select_entries(args.root, args.all, args.ids)
+    if isinstance(selected, int):
+        return selected
+    reports_dir = args.reports_dir if args.reports_dir is not None else args.root / "reports"
 
     active_failed = False
     for entry in selected:
@@ -84,6 +79,111 @@ def _validate_code_command(args: argparse.Namespace) -> int:
             print(f"FAIL {entry.id} ({failed_count} failed checks)")
 
     return 1 if active_failed else 0
+
+
+def _validate_output_command(args: argparse.Namespace) -> int:
+    selected = _select_entries(args.root, args.all, args.ids)
+    if isinstance(selected, int):
+        return selected
+
+    reports_dir = args.reports_dir if args.reports_dir is not None else args.root / "reports"
+    out_dir = args.out_dir if args.out_dir is not None else args.root / "out"
+
+    active_failed = False
+    for entry in selected:
+        try:
+            _run_driver(entry, args.root, out_dir, reports_dir)
+        except FileNotFoundError:
+            print(
+                f"freecadcmd not found: {os.environ.get('FREECADCMD', 'freecadcmd')}",
+                file=sys.stderr,
+            )
+            return 2
+
+        report_path = reports_dir / f"{entry.id}.json"
+        if not report_path.is_file():
+            print(f"wrote no report: {entry.id}", file=sys.stderr)
+            if entry.status != "wip":
+                active_failed = True
+            continue
+
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        failed_count = sum(1 for check in report.get("checks", []) if not check.get("passed"))
+        if report.get("passed"):
+            print(f"PASS {entry.id}")
+        elif entry.status == "wip":
+            print(f"WIP-FAIL {entry.id} ({failed_count} failed checks; report-only)")
+        else:
+            active_failed = True
+            print(f"FAIL {entry.id} ({failed_count} failed checks)")
+
+    return 1 if active_failed else 0
+
+
+def _compile_command(args: argparse.Namespace) -> int:
+    selected = _select_entries(args.root, False, [args.id])
+    if isinstance(selected, int):
+        return selected
+
+    out_dir = args.out_dir if args.out_dir is not None else args.root / "out"
+    reports_dir = args.root / "reports"
+    try:
+        return _run_driver(selected[0], args.root, out_dir, reports_dir)
+    except FileNotFoundError:
+        print(
+            f"freecadcmd not found: {os.environ.get('FREECADCMD', 'freecadcmd')}",
+            file=sys.stderr,
+        )
+        return 2
+
+
+def _select_entries(root: Path, all_entries: bool, ids: Sequence[str]):
+    if all_entries and ids:
+        print("cannot combine --all with explicit IDs", file=sys.stderr)
+        return 2
+    if not all_entries and not ids:
+        print("must pass --all or at least one ID", file=sys.stderr)
+        return 2
+
+    if not root.is_dir():
+        print(f"bad root: {root}", file=sys.stderr)
+        return 2
+    if not (root / "library").is_dir():
+        print(f"bad root: {root} has no library directory", file=sys.stderr)
+        return 2
+
+    entries = discover(root)
+    entries_by_id = {entry.id: entry for entry in entries}
+
+    if all_entries:
+        return entries
+
+    unknown = [entry_id for entry_id in ids if entry_id not in entries_by_id]
+    if unknown:
+        print(f"unknown id: {unknown[0]}", file=sys.stderr)
+        return 2
+    return [entries_by_id[entry_id] for entry_id in ids]
+
+
+def _run_driver(entry, root: Path, out_dir: Path, reports_dir: Path) -> int:
+    freecadcmd = os.environ.get("FREECADCMD", "freecadcmd")
+    driver_path = Path(compile_entry.__file__)
+    env = os.environ.copy()
+    existing_pythonpath = env.get("PYTHONPATH")
+    pythonpath_parts = [str(Path(root).resolve())]
+    if existing_pythonpath:
+        pythonpath_parts.append(existing_pythonpath)
+    env.update(
+        {
+            "LIBTOOLS_ROOT": str(root),
+            "LIBTOOLS_ENTRY": entry.id,
+            "LIBTOOLS_OUT": str(out_dir),
+            "LIBTOOLS_REPORTS": str(reports_dir),
+            "PYTHONPATH": os.pathsep.join(pythonpath_parts),
+        }
+    )
+    result = subprocess.run([freecadcmd, str(driver_path)], env=env)
+    return result.returncode
 
 
 if __name__ == "__main__":
