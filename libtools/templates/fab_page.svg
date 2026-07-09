@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="850" viewBox="0 0 1100 850">
+<!-- SLOT_GENERATION_PATH -->
+<style>
+  .page { fill: #ffffff; }
+  .title { font: 700 28px sans-serif; fill: #111111; }
+  .label { font: 700 18px sans-serif; fill: #111111; }
+  .body { font: 14px sans-serif; fill: #222222; }
+  .small { font: 12px sans-serif; fill: #444444; }
+  .view-frame { fill: none; stroke: #777777; stroke-width: 1.5; }
+  .member { stroke: #222222; stroke-width: 1; }
+</style>
+<rect class="page" x="0" y="0" width="1100" height="850"/>
+<text x="70" y="58" class="title">Fabrication Drawing</text>
+<!-- FAB_CONTENT -->
+</svg>

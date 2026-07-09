@@ -87,6 +87,18 @@ def run(root: str, entry_id: str, out_dir: str, reports_dir: str) -> int:
             failed_count = sum(1 for check in report.checks if not check.passed)
             print(f"FAIL {entry.id} ({failed_count} failed checks)")
 
+        if os.environ.get("LIBTOOLS_SLOTS") == "1" and report.passed:
+            from libtools.bom import write_bom_csv
+            from libtools.fab_drawing import write_fab_drawing
+
+            slots_path = Path(os.environ["LIBTOOLS_SLOTS_OUT"])
+            slots_path.mkdir(parents=True, exist_ok=True)
+            bom_path = slots_path / f"{entry.id}.bom.csv"
+            fab_path = slots_path / f"{entry.id}.fab.svg"
+            write_bom_csv(shapes, bom_path)
+            drawing_path = write_fab_drawing(entry, shapes, doc, fab_path)
+            print(f"SLOTS {entry.id} bom={bom_path} fab={fab_path} drawing={drawing_path}")
+
         return 0 if report.passed or entry.status == "wip" else 1
     except Exception:
         detail = traceback.format_exc()

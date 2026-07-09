@@ -23,8 +23,14 @@ jobs:
       # freecadcmd's stdlib resolution, so this job stays on system Python.
       - run: python3 -m pip install --break-system-packages -e '.[dev]'
       - run: python3 -m libtools validate-output --root . --all
+      - run: python3 -m libtools generate-slots --root . --all
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: validation-reports
           path: reports/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: generated-slots
+          path: slots/

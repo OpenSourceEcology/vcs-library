@@ -6,6 +6,7 @@ dist/
 output/
 reports/
 exported/
+slots/
 *.FCStd
 *.FCStd1
 .DS_Store

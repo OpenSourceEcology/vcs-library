@@ -32,6 +32,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
 
+def validate_code_main(argv: Sequence[str] | None = None) -> int:
+    return main(["validate-code", *(sys.argv[1:] if argv is None else argv)])
+
+
+def validate_output_main(argv: Sequence[str] | None = None) -> int:
+    return main(["validate-output", *(sys.argv[1:] if argv is None else argv)])
+
+
+def generate_slots_main(argv: Sequence[str] | None = None) -> int:
+    return main(["generate-slots", *(sys.argv[1:] if argv is None else argv)])
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="libtools")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -50,6 +62,14 @@ def _build_parser() -> argparse.ArgumentParser:
     validate_output_parser.add_argument("--all", action="store_true")
     validate_output_parser.add_argument("ids", nargs="*")
     validate_output_parser.set_defaults(func=_validate_output_command)
+
+    generate_slots_parser = subparsers.add_parser("generate-slots")
+    generate_slots_parser.add_argument("--root", type=Path, default=Path("."))
+    generate_slots_parser.add_argument("--reports-dir", type=Path)
+    generate_slots_parser.add_argument("--out-dir", type=Path, default=Path("slots"))
+    generate_slots_parser.add_argument("--all", action="store_true")
+    generate_slots_parser.add_argument("ids", nargs="*")
+    generate_slots_parser.set_defaults(func=_generate_slots_command)
 
     compile_parser = subparsers.add_parser("compile")
     compile_parser.add_argument("--root", type=Path, default=Path("."))
@@ -119,6 +139,53 @@ def _validate_output_command(args: argparse.Namespace) -> int:
         failed_count = sum(1 for check in report.get("checks", []) if not check.get("passed"))
         if report.get("passed"):
             print(f"PASS {entry.id}")
+        elif entry.status == "wip":
+            print(f"WIP-FAIL {entry.id} ({failed_count} failed checks; report-only)")
+        else:
+            active_failed = True
+            print(f"FAIL {entry.id} ({failed_count} failed checks)")
+
+    return 1 if active_failed else 0
+
+
+def _generate_slots_command(args: argparse.Namespace) -> int:
+    selected = _select_entries(args.root, args.all, args.ids)
+    if isinstance(selected, int):
+        return selected
+
+    reports_dir = args.reports_dir if args.reports_dir is not None else args.root / "reports"
+    slots_dir = args.out_dir if args.out_dir.is_absolute() else args.root / args.out_dir
+    cad_out_dir = args.root / "out"
+
+    active_failed = False
+    for entry in selected:
+        try:
+            _run_driver(entry, args.root, cad_out_dir, reports_dir, slots=True, slots_out_dir=slots_dir)
+        except FileNotFoundError:
+            print(
+                f"freecadcmd not found: {os.environ.get('FREECADCMD', 'freecadcmd')}",
+                file=sys.stderr,
+            )
+            return 2
+
+        report_path = reports_dir / f"{entry.id}.json"
+        if not report_path.is_file():
+            print(f"wrote no report: {entry.id}", file=sys.stderr)
+            if entry.status != "wip":
+                active_failed = True
+            continue
+
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        failed_count = sum(1 for check in report.get("checks", []) if not check.get("passed"))
+        if report.get("passed"):
+            bom_path = slots_dir / f"{entry.id}.bom.csv"
+            fab_path = slots_dir / f"{entry.id}.fab.svg"
+            if bom_path.is_file() and fab_path.is_file():
+                print(f"PASS {entry.id}")
+            else:
+                print(f"missing slot output: {entry.id}", file=sys.stderr)
+                if entry.status != "wip":
+                    active_failed = True
         elif entry.status == "wip":
             print(f"WIP-FAIL {entry.id} ({failed_count} failed checks; report-only)")
         else:
@@ -208,7 +275,15 @@ _HOSTILE_ENV_VARS = (
 )
 
 
-def _driver_env(entry, root: Path, out_dir: Path, reports_dir: Path) -> dict:
+def _driver_env(
+    entry,
+    root: Path,
+    out_dir: Path,
+    reports_dir: Path,
+    *,
+    slots: bool = False,
+    slots_out_dir: Path | None = None,
+) -> dict:
     env = os.environ.copy()
     for name in _HOSTILE_ENV_VARS:
         env.pop(name, None)
@@ -226,13 +301,24 @@ def _driver_env(entry, root: Path, out_dir: Path, reports_dir: Path) -> dict:
             "PYTHONPATH": os.pathsep.join(dict.fromkeys(pythonpath_parts)),
         }
     )
+    if slots:
+        env["LIBTOOLS_SLOTS"] = "1"
+        env["LIBTOOLS_SLOTS_OUT"] = str(slots_out_dir if slots_out_dir is not None else out_dir)
     return env
 
 
-def _run_driver(entry, root: Path, out_dir: Path, reports_dir: Path) -> int:
+def _run_driver(
+    entry,
+    root: Path,
+    out_dir: Path,
+    reports_dir: Path,
+    *,
+    slots: bool = False,
+    slots_out_dir: Path | None = None,
+) -> int:
     freecadcmd = os.environ.get("FREECADCMD", "freecadcmd")
     driver_path = Path(compile_entry.__file__)
-    env = _driver_env(entry, root, out_dir, reports_dir)
+    env = _driver_env(entry, root, out_dir, reports_dir, slots=slots, slots_out_dir=slots_out_dir)
     result = subprocess.run([freecadcmd, str(driver_path)], env=env)
     return result.returncode
 

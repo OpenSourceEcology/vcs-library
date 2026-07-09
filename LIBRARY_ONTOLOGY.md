@@ -71,8 +71,8 @@ IN = 25.4
 - `provenance.source`: Source citation URL.
 - `slots`: Mapping of Schema Canon slots.
 - `slots.icon`: Declared slot for an icon, currently null in seeded entries.
-- `slots.fab_drawing`: Declared slot for fabrication drawing, currently null in seeded entries.
-- `slots.bom`: Declared slot for bill of materials, currently null in seeded entries.
+- `slots.fab_drawing`: Generated fabrication drawing slot; declared in metadata and produced as `slots/<id>.fab.svg` by `generate-slots`.
+- `slots.bom`: Generated bill of materials slot; declared in metadata and produced as `slots/<id>.bom.csv` by `generate-slots`.
 - `slots.cheatsheet`: Declared slot for cheat sheet, currently null in seeded entries.
 
 `meta_complete` requires non-empty `id`, `layer`, `title`, `owner`, `license`, `version`, and `status`; it also requires `provenance.author` and a `slots` mapping.
@@ -207,7 +207,8 @@ Generated artifacts are not committed:
 - `out/*.FCStd` from `compile` and `validate-output`.
 - `reports/*.json` from validators.
 - `exported/*.json` from `export-json`.
+- `slots/*.bom.csv` and `slots/*.fab.svg` from `generate-slots`; see [Slot Generation Plan](docs/slot_generation_plan.md).
 
-The repository `.gitignore` excludes `reports/`, `exported/`, `*.FCStd`, and `*.FCStd1`.
+The repository `.gitignore` excludes `reports/`, `exported/`, `slots/`, `*.FCStd`, and `*.FCStd1`.
 
-Schema Canon slots for `icon`, `fab_drawing`, `bom`, and `cheatsheet` are declared in `meta.yaml`. The seeded entries do not yet produce those artifacts.
+Schema Canon slots for `icon`, `fab_drawing`, `bom`, and `cheatsheet` are declared in `meta.yaml`. The `fab_drawing` and `bom` slots are generated artifacts; `icon` and `cheatsheet` remain authored slots.

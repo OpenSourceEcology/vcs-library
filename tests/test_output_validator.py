@@ -210,3 +210,110 @@ def test_driver_env_strips_hostile_vars_and_pins_pythonpath(monkeypatch, tmp_pat
     # libtools must stay importable inside the freecadcmd child.
     package_parent = Path(libtools.cli.__file__).resolve().parent.parent
     assert str(package_parent) in env["PYTHONPATH"].split(os.pathsep)
+
+
+def test_driver_env_sets_slot_generation_contract(tmp_path):
+    from libtools.cli import _driver_env
+
+    entry = next(e for e in discover(FIXTURE_ROOT) if e.id == "good_entry")
+    env = _driver_env(
+        entry,
+        FIXTURE_ROOT,
+        tmp_path / "out",
+        tmp_path / "reports",
+        slots=True,
+        slots_out_dir=tmp_path / "slots",
+    )
+
+    assert env["LIBTOOLS_SLOTS"] == "1"
+    assert env["LIBTOOLS_OUT"] == str(tmp_path / "out")
+    assert env["LIBTOOLS_SLOTS_OUT"] == str(tmp_path / "slots")
+
+
+def test_cli_generate_slots_passes_when_outputs_exist(monkeypatch, capsys, tmp_path):
+    reports_dir = tmp_path / "reports"
+    slots_dir = tmp_path / "slots"
+
+    def run_driver(entry, root, out_dir, reports_dir, *, slots=False, slots_out_dir=None):
+        assert slots is True
+        assert out_dir == FIXTURE_ROOT / "out"
+        assert slots_out_dir == slots_dir
+        write_canned_report(reports_dir, entry, True)
+        slots_out_dir.mkdir(parents=True, exist_ok=True)
+        (slots_out_dir / f"{entry.id}.bom.csv").write_text("count,description\n", encoding="utf-8")
+        (slots_out_dir / f"{entry.id}.fab.svg").write_text("<svg></svg>", encoding="utf-8")
+        return 0
+
+    monkeypatch.setattr("libtools.cli._run_driver", run_driver)
+
+    code = main(
+        [
+            "generate-slots",
+            "--root",
+            str(FIXTURE_ROOT),
+            "--reports-dir",
+            str(reports_dir),
+            "--out-dir",
+            str(slots_dir),
+            "good_entry",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert code == 0
+    assert "PASS good_entry" in captured.out
+
+
+def test_cli_generate_slots_active_compile_failure_returns_one(monkeypatch, capsys, tmp_path):
+    reports_dir = tmp_path / "reports"
+
+    def run_driver(entry, root, out_dir, reports_dir, *, slots=False, slots_out_dir=None):
+        write_canned_report(reports_dir, entry, False)
+        return 1
+
+    monkeypatch.setattr("libtools.cli._run_driver", run_driver)
+
+    code = main(
+        [
+            "generate-slots",
+            "--root",
+            str(FIXTURE_ROOT),
+            "--reports-dir",
+            str(reports_dir),
+            "bad_entry",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert code == 1
+    assert "FAIL bad_entry" in captured.out
+
+
+def test_cli_generate_slots_wip_failure_is_report_only(monkeypatch, capsys, tmp_path):
+    root = copy_fixture(tmp_path)
+    meta_path = root / "library" / "parts" / "bad_entry" / "meta.yaml"
+    meta = yaml.safe_load(meta_path.read_text(encoding="utf-8"))
+    meta["status"] = "wip"
+    meta_path.write_text(yaml.safe_dump(meta), encoding="utf-8")
+
+    def run_driver(entry, root, out_dir, reports_dir, *, slots=False, slots_out_dir=None):
+        write_canned_report(reports_dir, entry, False)
+        return 1
+
+    monkeypatch.setattr("libtools.cli._run_driver", run_driver)
+
+    code = main(["generate-slots", "--root", str(root), "bad_entry"])
+
+    captured = capsys.readouterr()
+    assert code == 0
+    assert "WIP-FAIL bad_entry" in captured.out
+
+
+def test_cli_generate_slots_missing_freecadcmd_is_usage_error(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("FREECADCMD", str(tmp_path / "missing-freecadcmd"))
+
+    code = main(["generate-slots", "--root", str(FIXTURE_ROOT), "good_entry"])
+
+    captured = capsys.readouterr()
+    assert code == 2
+    assert "freecadcmd not found" in captured.err

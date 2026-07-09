@@ -9,8 +9,17 @@ description = "Validator toolkit for OSE part libraries (schemas, compilers, cod
 requires-python = ">=3.11"
 dependencies = ["pyyaml"]
 
+[project.scripts]
+libtools = "libtools.cli:main"
+validate-code = "libtools.cli:validate_code_main"
+validate-output = "libtools.cli:validate_output_main"
+generate-slots = "libtools.cli:generate_slots_main"
+
 [project.optional-dependencies]
 dev = ["pytest"]
 
 [tool.setuptools]
 packages = ["libtools"]
+
+[tool.setuptools.package-data]
+libtools = ["templates/*.svg"]
