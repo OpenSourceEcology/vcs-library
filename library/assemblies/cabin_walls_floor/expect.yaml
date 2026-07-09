@@ -1,0 +1,38 @@
+envelope:
+  bbox_in:
+    x: [-0.5, 155.5]
+    y: [-0.5, 144.5]
+    z: [0.0, 104.75]
+  tolerance_in: 0.5
+solids:
+  min_count: 164
+  roles:
+    - pattern: "Floor_*_Rim_Joist"
+      count: 8
+    - pattern: "Floor_Interior_Joist_*"
+      count: 6
+    - pattern: "Floor_Bottom_PT_Plywood_*"
+      count: 7
+    - pattern: "Floor_Top_OSB_*"
+      count: 7
+    - pattern: "*_Bottom_Plate"
+      count: 12
+    - pattern: "*_Top_Plate"
+      count: 12
+    - pattern: "*_Standard_Stud_*"
+      count: 16
+    - pattern: "*_Standard_Right_End_Stud"
+      count: 8
+    - pattern: "*_Corner_U_*"
+      count: 12
+    - pattern: "*Exterior*OSB*"
+      count: 12
+    - pattern: "*_Header_*"
+      count: 12
+    - pattern: "*_Blocking_*"
+      count: 24
+overlap:
+  tolerance_in3: 0.01
+  allowed_contact:
+    - ["*_Corner_U_*_Leg", "*_Stud_*"]
+params: []

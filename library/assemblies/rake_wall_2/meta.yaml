@@ -1,0 +1,17 @@
+id: rake_wall_2
+layer: assembly
+title: Rake wall assembly with side rake modules
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Catarina
+  drive_file_id: 1fnM-jUfXzFyNMAuS05QFrkUgN7CFCAPK
+  original_filename: "VCS Schema - Assembly - Rake Wall 2.py"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null

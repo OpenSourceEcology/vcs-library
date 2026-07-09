@@ -165,23 +165,47 @@ def _select_entries(root: Path, all_entries: bool, ids: Sequence[str]):
     return [entries_by_id[entry_id] for entry_id in ids]
 
 
-def _run_driver(entry, root: Path, out_dir: Path, reports_dir: Path) -> int:
-    freecadcmd = os.environ.get("FREECADCMD", "freecadcmd")
-    driver_path = Path(compile_entry.__file__)
+# Env vars that make freecadcmd's embedded interpreter resolve another
+# Python's stdlib (observed as "No module named 'math'" under CI toolcache
+# Pythons). The driver child must not inherit them.
+_HOSTILE_ENV_VARS = (
+    "PYTHONHOME",
+    "PYTHONSTARTUP",
+    "pythonLocation",
+    "Python_ROOT_DIR",
+    "Python2_ROOT_DIR",
+    "Python3_ROOT_DIR",
+    "LD_LIBRARY_PATH",
+    "DYLD_LIBRARY_PATH",
+    "VIRTUAL_ENV",
+)
+
+
+def _driver_env(entry, root: Path, out_dir: Path, reports_dir: Path) -> dict:
     env = os.environ.copy()
-    existing_pythonpath = env.get("PYTHONPATH")
-    pythonpath_parts = [str(Path(root).resolve())]
-    if existing_pythonpath:
-        pythonpath_parts.append(existing_pythonpath)
+    for name in _HOSTILE_ENV_VARS:
+        env.pop(name, None)
+
+    # freecadcmd must import libtools: put the package's parent directory and
+    # the library root on PYTHONPATH, nothing else.
+    package_parent = Path(compile_entry.__file__).resolve().parent.parent
+    pythonpath_parts = [str(package_parent), str(Path(root).resolve())]
     env.update(
         {
             "LIBTOOLS_ROOT": str(root),
             "LIBTOOLS_ENTRY": entry.id,
             "LIBTOOLS_OUT": str(out_dir),
             "LIBTOOLS_REPORTS": str(reports_dir),
-            "PYTHONPATH": os.pathsep.join(pythonpath_parts),
+            "PYTHONPATH": os.pathsep.join(dict.fromkeys(pythonpath_parts)),
         }
     )
+    return env
+
+
+def _run_driver(entry, root: Path, out_dir: Path, reports_dir: Path) -> int:
+    freecadcmd = os.environ.get("FREECADCMD", "freecadcmd")
+    driver_path = Path(compile_entry.__file__)
+    env = _driver_env(entry, root, out_dir, reports_dir)
     result = subprocess.run([freecadcmd, str(driver_path)], env=env)
     return result.returncode
 

@@ -1,0 +1,17 @@
+id: cabin_walls_floor
+layer: assembly
+title: Cabin floor and walls assembly
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Catarina
+  drive_file_id: 1T-KZ7tfeXxm8RcStqN4M0vSjetUI7tLe
+  original_filename: "Schema - cabin assembly - walls + floor.py"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null

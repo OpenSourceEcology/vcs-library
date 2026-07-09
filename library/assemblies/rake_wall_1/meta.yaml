@@ -1,0 +1,17 @@
+id: rake_wall_1
+layer: assembly
+title: Rake wall assembly parametric base Z
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Catarina
+  drive_file_id: 1fULOu5ABH_6fAUIkG6dGSSzwDWp8E03U
+  original_filename: "VCS Schema - Assembly - Rake Wall 1.py"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null

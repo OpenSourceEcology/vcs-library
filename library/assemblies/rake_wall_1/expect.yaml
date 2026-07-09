@@ -1,0 +1,52 @@
+envelope:
+  bbox_in:
+    x: [-0.5, 155.5]
+    y: [-0.5, 144.5]
+    z: [0.0, 49.5]
+  tolerance_in: 0.5
+solids:
+  min_count: 88
+  roles:
+    - pattern: "*_Bottom_Plate"
+      count: 12
+    - pattern: "*_Sloped_Top_Plate"
+      count: 12
+    - pattern: "*_Exterior_OSB"
+      count: 12
+    - pattern: "*_Continuous_Second_Top_Plate_2x6*"
+      count: 4
+    - pattern: "*_U_Corner_*"
+      count: 12
+    - pattern: "*_End_Stud"
+      count: 24
+    - pattern: "*_Interior_Stud_1_24oc"
+      count: 12
+overlap:
+  tolerance_in3: 0.01
+  allowed_contact:
+    - ["*_U_Corner_Primary_Edge_Stud", "*_End_Stud"]
+params:
+  - key: building_width_in
+    min: 1
+  - key: building_depth_in
+    min: 1
+  - key: module_width_in
+    min: 1
+  - key: modules_per_wall
+    min: 1
+  - key: stud_spacing_in
+    min: 1
+  - key: osb_thickness_in
+    min: 0
+  - key: front_height_in
+    min: 3
+  - key: back_height_in
+    min: 3
+  - key: second_top_plate_thickness_in
+    min: 0
+  - key: front_back_second_top_plate_length_in
+    min: 0
+  - key: left_right_second_top_plate_length_in
+    min: 0
+  - key: assembly_base_z_in
+    min: 0

@@ -1,0 +1,61 @@
+envelope:
+  bbox_in:
+    x: [-0.5, 155.5]
+    y: [-0.5, 144.5]
+    z: [0.0, 46.75]
+  tolerance_in: 0.5
+solids:
+  min_count: 96
+  roles:
+    - pattern: "*Corner_Module*2x6_Full_Depth"
+      count: 8
+    - pattern: "*Corner_Module*2x3_Between_2x6s"
+      count: 8
+    - pattern: "*_Standard_Wall_Module_Bottom_Plate"
+      count: 6
+    - pattern: "*_Standard_Wall_Module_Top_Plate"
+      count: 6
+    - pattern: "*_Rake_Module_*_Bottom_Plate"
+      count: 6
+    - pattern: "*_Rake_Module_*_Sloped_Top_Plate"
+      count: 6
+    - pattern: "*_Exterior_OSB"
+      count: 16
+    - pattern: "*_Continuous_Second_Top_Plate_2x6*"
+      count: 4
+    - pattern: "*_End_Stud"
+      count: 24
+    - pattern: "*_Interior_Stud_*"
+      count: 12
+overlap:
+  tolerance_in3: 0.01
+  allowed_contact: []
+params:
+  - key: building_width_in
+    min: 1
+  - key: clear_span_between_front_back_walls_in
+    min: 1
+  - key: side_rake_pitch_rise_per_12_in
+    min: 0
+  - key: front_wall_height_in
+    min: 3
+  - key: back_wall_height_in
+    min: 3
+  - key: assembly_base_z_in
+    min: 0
+  - key: corner_module_width_in
+    min: 0.1
+  - key: standard_module_width_in
+    min: 1
+  - key: standard_modules_per_wall
+    min: 1
+  - key: stud_spacing_in
+    min: 1
+  - key: second_top_plate_thickness_in
+    min: 0
+  - key: front_back_second_top_plate_length_in
+    min: 0
+  - key: left_right_second_top_plate_length_in
+    min: 0
+  - key: osb_thickness_in
+    min: 0

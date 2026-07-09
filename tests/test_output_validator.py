@@ -1,9 +1,11 @@
 import json
+import os
 from pathlib import Path
 from shutil import copytree
 
 import yaml
 
+import libtools.cli
 from libtools.cli import main
 from libtools.geometry_checks import ShapeInfo
 from libtools.output_validator import failure_report, validate_output
@@ -187,3 +189,24 @@ def test_cli_validate_output_missing_freecadcmd_is_usage_error(monkeypatch, caps
     captured = capsys.readouterr()
     assert code == 2
     assert "freecadcmd not found" in captured.err
+
+
+def test_driver_env_strips_hostile_vars_and_pins_pythonpath(monkeypatch, tmp_path):
+    from libtools.cli import _driver_env
+
+    monkeypatch.setenv("PYTHONHOME", "/opt/hostedtoolcache/Python/3.12.0")
+    monkeypatch.setenv("LD_LIBRARY_PATH", "/opt/hostedtoolcache/Python/3.12.0/lib")
+    monkeypatch.setenv("pythonLocation", "/opt/hostedtoolcache/Python/3.12.0")
+    monkeypatch.setenv("PYTHONPATH", "/somewhere/else")
+
+    entry = next(e for e in discover(FIXTURE_ROOT) if e.id == "good_entry")
+    env = _driver_env(entry, FIXTURE_ROOT, tmp_path / "out", tmp_path / "reports")
+
+    assert "PYTHONHOME" not in env
+    assert "LD_LIBRARY_PATH" not in env
+    assert "pythonLocation" not in env
+    assert "/somewhere/else" not in env["PYTHONPATH"]
+    assert env["LIBTOOLS_ENTRY"] == "good_entry"
+    # libtools must stay importable inside the freecadcmd child.
+    package_parent = Path(libtools.cli.__file__).resolve().parent.parent
+    assert str(package_parent) in env["PYTHONPATH"].split(os.pathsep)

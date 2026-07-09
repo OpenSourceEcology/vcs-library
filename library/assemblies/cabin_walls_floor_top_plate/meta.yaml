@@ -1,0 +1,17 @@
+id: cabin_walls_floor_top_plate
+layer: assembly
+title: Cabin floor, walls, and single top plate assembly
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Catarina
+  drive_file_id: 1JoQ7DbtRNqX3UEYqs3TdWL-VWzmnGllQ
+  original_filename: "Schema - cabin assembly - walls + floor + top plate.py"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null
