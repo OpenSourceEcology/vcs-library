@@ -1,0 +1,4 @@
+params:
+  - key: width_in
+    min: 1
+    max: 200

@@ -1,0 +1,14 @@
+id: bad_entry
+layer: part
+title: Bad Entry
+owner: Test Owner
+license: CC-BY-SA-4.0
+version: "0.1.0"
+status: active
+provenance:
+  author: Test
+slots:
+  icon:
+  fab_drawing:
+  bom:
+  cheatsheet:

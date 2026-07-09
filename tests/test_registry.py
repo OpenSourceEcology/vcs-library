@@ -18,8 +18,8 @@ def copy_fixture(tmp_path: Path) -> Path:
 def test_discover_finds_good_fixture_entry():
     entries = discover(FIXTURE_ROOT)
 
-    assert len(entries) == 1
-    entry = entries[0]
+    assert {entry.id for entry in entries} == {"good_entry", "bad_entry"}
+    entry = next(entry for entry in entries if entry.id == "good_entry")
     assert entry.id == "good_entry"
     assert entry.layer == "part"
     assert entry.status == "active"
@@ -61,7 +61,7 @@ def test_discover_raises_on_invalid_status_value(tmp_path):
 
 
 def test_load_schema_returns_schema_dict():
-    entry = discover(FIXTURE_ROOT)[0]
+    entry = next(entry for entry in discover(FIXTURE_ROOT) if entry.id == "good_entry")
 
     schema = load_schema(entry)
 
@@ -72,7 +72,7 @@ def test_load_schema_raises_when_schema_missing(tmp_path):
     root = copy_fixture(tmp_path)
     schema_path = root / "library" / "parts" / "good_entry" / "schema.py"
     schema_path.write_text("NAME = 'Good_Entry'\n", encoding="utf-8")
-    entry = discover(root)[0]
+    entry = next(entry for entry in discover(root) if entry.id == "good_entry")
 
     with pytest.raises(RegistryError, match="SCHEMA"):
         load_schema(entry)
