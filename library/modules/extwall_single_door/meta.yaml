@@ -1,0 +1,17 @@
+id: extwall_single_door
+layer: module
+title: Exterior wall single door module
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Catarina
+  drive_file_id: 1ipG_l8CVdNFuLN9SKHOaxvfzBfCI5jcP
+  original_filename: "VCS Schema - Module - ExtWall - Single Door.rtf"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null

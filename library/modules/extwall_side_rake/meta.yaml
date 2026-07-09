@@ -1,0 +1,17 @@
+id: extwall_side_rake
+layer: module
+title: Exterior wall side rake module
+owner: Catarina
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Catarina
+  drive_file_id: 1RqhC2nv3s89e3Y2yAyvBhS19cQCXnmiT
+  original_filename: "VCS Schema - Module - ExtWall - Side Rake.py"
+  source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null

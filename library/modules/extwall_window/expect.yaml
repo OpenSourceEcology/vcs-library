@@ -1,0 +1,35 @@
+envelope:
+  bbox_in:
+    x: [0.0, 48.0]
+    y: [-0.5, 5.5]
+    z: [0.0, 96.0]
+  tolerance_in: 0.5
+solids:
+  min_count: 21
+  roles:
+    - pattern: "*Plate"
+      count: 2
+    - pattern: "*End_Stud"
+      count: 2
+    - pattern: "*King_Stud"
+      count: 2
+    - pattern: "*Jack_Stud_*"
+      count: 2
+    - pattern: "Window_Sill"
+      count: 1
+    - pattern: "Flat_2x6_Header_Nailer"
+      count: 1
+    - pattern: "Header_*"
+      count: 2
+    - pattern: "*Cripple_*"
+      count: 2
+    - pattern: "*Blocking_*"
+      count: 6
+    - pattern: "*OSB*"
+      count: 1
+overlap:
+  tolerance_in3: 0.01
+  allowed_contact: []
+params:
+  - key: window_rough_width_in
+    max: 72

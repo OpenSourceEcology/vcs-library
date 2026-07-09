@@ -2,40 +2,6 @@ import FreeCAD as App
 import Part
 
 # =====================================================
-# WINDOW MODULE SCHEMA — EDIT THIS SECTION
-# =====================================================
-
-window_module_schema = {
-    "module_width_in": 48,
-    "stud_height_in": 92.625,
-    "stud_spacing_in": 24,
-
-    # Options: "2x4", "2x6", "2x8"
-    "lumber": "2x6",
-
-    "window_rough_width_in": 24,
-    "window_rough_height_in": 36,
-    "window_sill_height_in": 36,
-    "window_left_in": None,
-
-    "building_width_ft": 12,
-    "clear_span_floors_above": 2,
-
-    "header_ply_count": 2,
-    "flat_header_nailer": True,
-
-    "blocking": True,
-    "blocking_spacing_in": 24,
-
-    "include_osb": True,
-    "osb_thickness_in": 0.5,
-    "osb_sheet_width_in": 48,
-    "osb_sheet_height_in": 96,
-
-    "origin": (0, 0, 0)
-}
-
-# =====================================================
 # WINDOW MODULE COMPILER
 # =====================================================
 
@@ -79,7 +45,7 @@ def select_header_size(schema):
         else:
             raise ValueError("Opening too large for this simple header selector.")
 
-def compile_window_module(schema):
+def compile(schema, doc):
     ox, oy, oz = schema["origin"]
     ox *= IN
     oy *= IN
@@ -130,8 +96,6 @@ def compile_window_module(schema):
 
     if header_top_z > top_plate_z:
         raise ValueError("Window opening plus header is too tall for this wall module.")
-
-    doc = App.newDocument("Parametric_Window_Module")
 
     def add_box(name, x, y, z, sx, sy, sz):
         obj = doc.addObject("Part::Box", name)
@@ -351,16 +315,7 @@ def compile_window_module(schema):
 
     doc.recompute()
 
-    try:
-        import FreeCADGui as Gui
-        Gui.ActiveDocument.ActiveView.viewAxometric()
-        Gui.SendMsgToActiveView("ViewFit")
-    except Exception:
-        pass
-
     print("Selected header:", header_ply_count, "adjacent", header_size, "plies")
     print("Jack studs per side:", jack_count)
 
-    return doc
-
-compile_window_module(window_module_schema)
+    return list(doc.Objects)

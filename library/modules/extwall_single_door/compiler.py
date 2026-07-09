@@ -2,41 +2,6 @@ import FreeCAD as App
 import Part
 
 # =====================================================
-# DOOR MODULE SCHEMA — EDIT THIS SECTION
-# =====================================================
-
-door_module_schema = {
-    "module_width_in": 48,
-    "stud_height_in": 92.625,
-    "stud_spacing_in": 24,
-
-    # Options: "2x4", "2x6", "2x8"
-    "lumber": "2x6",
-
-    # Door rough opening
-    # Height is measured from the floor / bottom of module
-    "door_rough_width_in": 38.25,
-    "door_rough_height_in": 82,
-    "door_left_in": None,
-
-    # Header
-    "header_lumber": "2x8",
-    "header_ply_count": 2,
-    "flat_header_nailer": True,
-
-    # Blocking between king studs and jack studs
-    "blocking": True,
-    "blocking_spacing_in": 25,
-
-    "include_osb": True,
-    "osb_thickness_in": 0.5,
-    "osb_sheet_width_in": 48,
-    "osb_sheet_height_in": 96,
-
-    "origin": (0, 0, 0)
-}
-
-# =====================================================
 # DOOR MODULE COMPILER
 # =====================================================
 
@@ -50,7 +15,7 @@ LUMBER_SIZES = {
     "2x12": 11.25
 }
 
-def compile_door_module(schema):
+def compile(schema, doc):
     ox, oy, oz = schema["origin"]
     ox *= IN
     oy *= IN
@@ -102,8 +67,6 @@ def compile_door_module(schema):
 
     if header_top_z > top_plate_z:
         raise ValueError("Door opening plus header is too tall.")
-
-    doc = App.newDocument("Parametric_Door_Module")
 
     def add_box(name, x, y, z, sx, sy, sz):
         obj = doc.addObject("Part::Box", name)
@@ -240,13 +203,4 @@ def compile_door_module(schema):
 
     doc.recompute()
 
-    try:
-        import FreeCADGui as Gui
-        Gui.ActiveDocument.ActiveView.viewAxometric()
-        Gui.SendMsgToActiveView("ViewFit")
-    except Exception:
-        pass
-
-    return doc
-
-compile_door_module(door_module_schema)
+    return list(doc.Objects)

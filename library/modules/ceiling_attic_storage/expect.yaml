@@ -1,0 +1,27 @@
+envelope:
+  bbox_in:
+    x: [0.0, 155.0]
+    y: [0.0, 144.0]
+    z: [0.0, 6.25]
+  tolerance_in: 0.5
+solids:
+  min_count: 21
+  roles:
+    - pattern: "Front_Rim_Joist_*"
+      count: 2
+    - pattern: "Back_Rim_Joist_*"
+      count: 2
+    - pattern: "Left_Rim_Joist_*"
+      count: 2
+    - pattern: "Right_Rim_Joist_*"
+      count: 2
+    - pattern: "Ceiling_Joist_*"
+      count: 6
+    - pattern: "Ceiling_Deck_*"
+      count: 7
+overlap:
+  tolerance_in3: 0.01
+  allowed_contact: []
+params:
+  - key: rim_joist_count
+    min: 1

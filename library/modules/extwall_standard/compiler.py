@@ -1,28 +1,6 @@
 import FreeCAD as App
 
 # =====================================================
-# WALL MODULE SCHEMA — EDIT THIS SECTION
-# =====================================================
-
-wall_module_schema = {
-    "module_width_in": 48,
-    "stud_height_in": 92.625,
-    "stud_spacing_in": 24,
-
-    # Options: "2x4", "2x6", "2x8"
-    "lumber": "2x6",
-
-    "osb_thickness_in": 0.5,
-    "osb_sheet_height_in": 96,
-
-    # Optional additions
-    "left_corner_reinforcement": True,
-    "right_corner_reinforcement": True,
-
-    "origin": (0, 0, 0)
-}
-
-# =====================================================
 # WALL MODULE COMPILER
 # =====================================================
 
@@ -34,7 +12,7 @@ LUMBER_SIZES = {
     "2x8": 7.25
 }
 
-def compile_wall_module(schema):
+def compile(schema, doc):
     ox, oy, oz = schema["origin"]
     ox *= IN
     oy *= IN
@@ -52,8 +30,6 @@ def compile_wall_module(schema):
     t = 1.5 * IN
     osb = schema["osb_thickness_in"] * IN
     osb_sheet_height = schema.get("osb_sheet_height_in", 96) * IN
-
-    doc = App.newDocument("Parametric_Wall_Module")
 
     def add_box(name, x, y, z, sx, sy, sz):
         obj = doc.addObject("Part::Box", name)
@@ -197,13 +173,4 @@ def compile_wall_module(schema):
 
     doc.recompute()
 
-    try:
-        import FreeCADGui as Gui
-        Gui.ActiveDocument.ActiveView.viewAxometric()
-        Gui.SendMsgToActiveView("ViewFit")
-    except Exception:
-        pass
-
-    return doc
-
-compile_wall_module(wall_module_schema)
+    return list(doc.Objects)
