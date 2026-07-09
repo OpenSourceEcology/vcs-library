@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+.venv/
+output/
+reports/
+exported/
+*.FCStd
+*.FCStd1
+.DS_Store

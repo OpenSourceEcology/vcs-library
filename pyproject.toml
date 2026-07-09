@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "libtools"
+version = "0.1.0"
+description = "Validator toolkit for OSE part libraries (schemas, compilers, code and output validators)"
+requires-python = ">=3.11"
+dependencies = ["pyyaml"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools]
+packages = ["libtools"]
