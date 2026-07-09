@@ -15,3 +15,10 @@ slots:
   fab_drawing: null
   bom: null
   cheatsheet: null
+known_issues:
+  - The corner reinforcement U-channel is modeled on top of the standard stud
+    layout, so one U leg fully coincides with the end stud (about 764 in3 of
+    duplicated volume per reinforced corner). Kept as authored; affects
+    volume-derived counts, not placement. Flagged by the output validator,
+    allowed by expect.yaml as a documented author decision pending owner
+    review.

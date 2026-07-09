@@ -36,5 +36,9 @@ solids:
 overlap:
   tolerance_in3: 0.01
   allowed_contact:
+    # The author's U-corner reinforcement is drawn over the existing end
+    # stud, fully coinciding with it (same decision allowed in the
+    # extwall_standard module entry). Recorded in meta.yaml known_issues.
     - ["*_Corner_U_*_Leg", "*_Stud_*"]
+    - ["*_End_Stud", "*_Corner_U_*_Leg"]
 params: []
