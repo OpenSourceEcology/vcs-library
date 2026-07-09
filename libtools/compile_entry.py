@@ -117,5 +117,10 @@ def _load_compiler(path: Path) -> ModuleType:
     return module
 
 
-if __name__ == "__main__":
+# freecadcmd executes this file with an arbitrary __name__ (not "__main__"),
+# so script-mode detection also keys off the driver env contract. A normal
+# `import libtools.compile_entry` keeps its package __name__ and never runs.
+if __name__ != "libtools.compile_entry" and os.environ.get("LIBTOOLS_ENTRY"):
+    sys.exit(main())
+elif __name__ == "__main__":
     sys.exit(main())
