@@ -10,6 +10,13 @@ provenance:
   drive_file_id: 1RqhC2nv3s89e3Y2yAyvBhS19cQCXnmiT
   original_filename: "VCS Schema - Module - ExtWall - Side Rake.py"
   source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+interface:
+  system: vcs12
+  role: wall
+  width_in: 48.0
+  depth_in: 6.0
+  height_in: 60.0
+  exterior_face: -y
 slots:
   icon: null
   fab_drawing: null

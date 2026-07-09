@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,10 @@ _DIMENSION_WORDS = (
 _EXACT_DIMENSION_KEYS = {"x", "y", "z"}
 _EXEMPT_SUFFIXES = ("_count", "_plies", "_deg")
 _EXEMPT_KEYS = {"stories", "version"}
+_INTERFACE_SYSTEM_PATTERN = re.compile(r"[a-z0-9_]+")
+_INTERFACE_ROLES = {"wall", "roof", "floor", "ceiling", "assembly"}
+_EXTERIOR_FACES = {"+x", "-x", "+y", "-y"}
+_INTERFACE_SPAN_TOLERANCE_IN = 2.0
 
 
 def validate_code(entry: Entry) -> Report:
@@ -58,6 +63,7 @@ def validate_code(entry: Entry) -> Report:
 
     checks.append(_check_compiler_contract(entry.compiler_path))
     checks.append(_check_meta_complete(entry.meta))
+    checks.append(_check_interface_consistent(entry.meta, entry.expect))
 
     return Report(
         id=entry.id,
@@ -193,6 +199,81 @@ def _check_meta_complete(meta: dict[str, Any]) -> Check:
         missing.append("slots")
 
     return Check("meta_complete", not missing, ", ".join(missing))
+
+
+def _check_interface_consistent(meta: dict[str, Any], expect: dict[str, Any]) -> Check:
+    interface = meta.get("interface")
+    if interface is None:
+        return Check("interface_consistent", True, "no interface")
+    if not isinstance(interface, dict):
+        return Check("interface_consistent", False, "interface must be a mapping")
+
+    failures: list[str] = []
+
+    system = interface.get("system")
+    if not isinstance(system, str) or not _INTERFACE_SYSTEM_PATTERN.fullmatch(system):
+        failures.append("system invalid")
+
+    role = interface.get("role")
+    if role not in _INTERFACE_ROLES:
+        failures.append("role invalid")
+
+    for field in ("width_in", "depth_in", "height_in"):
+        value = interface.get(field)
+        if not _positive_number(value):
+            failures.append(f"{field} must be positive")
+
+    exterior_face = interface.get("exterior_face")
+    if exterior_face not in _EXTERIOR_FACES:
+        failures.append("exterior_face invalid")
+
+    if role == "wall" and isinstance(expect.get("envelope"), dict):
+        bbox = expect["envelope"].get("bbox_in")
+        if isinstance(bbox, dict):
+            _check_interface_span(interface, bbox, "width_in", "x", failures)
+            _check_interface_span(interface, bbox, "depth_in", "y", failures)
+            _check_interface_span(interface, bbox, "height_in", "z", failures)
+
+    return Check("interface_consistent", not failures, "; ".join(failures))
+
+
+def _check_interface_span(
+    interface: dict[str, Any],
+    bbox: dict[str, Any],
+    field: str,
+    axis: str,
+    failures: list[str],
+) -> None:
+    value = interface.get(field)
+    if not _positive_number(value):
+        return
+
+    span = _bbox_axis_span(bbox.get(axis))
+    if span is None:
+        return
+    if abs(value - span) > _INTERFACE_SPAN_TOLERANCE_IN:
+        failures.append(f"{field} differs from envelope {axis} span {span:g}")
+
+
+def _bbox_axis_span(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    if not isinstance(value, list) or len(value) != 2:
+        return None
+    minimum, maximum = value
+    if not _number(minimum) or not _number(maximum):
+        return None
+    return float(maximum) - float(minimum)
+
+
+def _positive_number(value: Any) -> bool:
+    return _number(value) and value > 0
+
+
+def _number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
 def _nonempty(value: Any) -> bool:

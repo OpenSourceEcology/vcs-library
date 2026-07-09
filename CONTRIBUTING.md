@@ -32,6 +32,8 @@ Then edit the four entry files:
 
 Set `meta.yaml` field `id` to the new directory name and `layer` to the singular layer name. Use `snake_case` for the entry id.
 
+Add optional `interface` metadata when an entry should be placeable in downstream layout editors. Entries without it remain valid, but they do not advertise placement role, footprint, or exterior-face hints.
+
 Run code validation locally:
 
 ```bash

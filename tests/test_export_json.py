@@ -31,11 +31,13 @@ def test_export_entry_has_canonical_shape_and_schema_values():
         "units",
         "schema",
         "provenance",
+        "interface",
     ]
     assert exported["id"] == "good_entry"
     assert exported["units"] == "in"
     assert exported["schema"] == load_schema(entry)
     assert exported["provenance"] == {"author": "Test"}
+    assert exported["interface"] is None
 
 
 def test_export_entry_converts_schema_tuples_to_lists(tmp_path):

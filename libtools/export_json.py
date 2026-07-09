@@ -15,6 +15,7 @@ def export_entry(entry: Entry) -> dict:
         "units": schema.get("units"),
         "schema": schema,
         "provenance": entry.meta.get("provenance"),
+        "interface": entry.meta.get("interface"),
     }
 
 

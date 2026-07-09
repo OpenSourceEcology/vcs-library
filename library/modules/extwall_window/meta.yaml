@@ -10,6 +10,13 @@ provenance:
   drive_file_id: 1b6QkbgpyEJEApcXbptKL5Dasw9DUu4pH
   original_filename: "VCS Schema - Module - ExtWall - Window.rtf"
   source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+interface:
+  system: vcs12
+  role: wall
+  width_in: 48.0
+  depth_in: 6.0
+  height_in: 96.0
+  exterior_face: -y
 slots:
   icon: null
   fab_drawing: null

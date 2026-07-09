@@ -77,6 +77,31 @@ IN = 25.4
 
 `meta_complete` requires non-empty `id`, `layer`, `title`, `owner`, `license`, `version`, and `status`; it also requires `provenance.author` and a `slots` mapping.
 
+## Interface Metadata
+
+`meta.yaml` may include an optional `interface` mapping. When present, it declares that the entry is a placeable module for downstream layout editors. Entries without `interface` remain valid library entries but do not advertise placement metadata.
+
+```yaml
+interface:
+  system: example_system
+  role: wall
+  width_in: 48.0
+  depth_in: 5.5
+  height_in: 95.625
+  exterior_face: -y
+```
+
+Interface fields are:
+
+- `system`: Construction-system id using lowercase letters, digits, and underscores.
+- `role`: Placement role. Allowed values are `wall`, `roof`, `floor`, `ceiling`, and `assembly`.
+- `width_in`: Footprint width in local x, along a wall run for wall roles.
+- `depth_in`: Footprint depth in local y, such as wall thickness for wall roles.
+- `height_in`: Overall local z height.
+- `exterior_face`: Local axis the sheathing or exterior-facing side points toward. Allowed values are `+x`, `-x`, `+y`, and `-y`.
+
+The `interface_consistent` code check passes with detail `no interface` when the section is absent. When present, it requires `interface` to be a mapping, checks `system`, `role`, positive numeric dimensions, and `exterior_face`, and for `role: wall` entries with `expect.envelope.bbox_in`, compares `width_in`, `depth_in`, and `height_in` to the x, y, and z envelope spans respectively with a tolerance of 2.0 in. Non-wall roles skip the envelope span cross-check.
+
 ## Expect Fields
 
 `expect.yaml` is a mapping. Missing sections default to empty mappings or no rules.
@@ -132,6 +157,7 @@ Tier 1 checks are:
 - `param_admissibility`: Checks `expect.yaml` parameter min and max rules against top-level schema values.
 - `compiler_contract`: Requires `compile(schema, doc)` and rejects top-level calls.
 - `meta_complete`: Requires identity, ownership, license, status, provenance author, and slots metadata.
+- `interface_consistent`: Validates optional placeable-module interface metadata.
 
 Tier 2 is output validation. It needs `freecadcmd`:
 

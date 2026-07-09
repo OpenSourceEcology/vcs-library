@@ -10,6 +10,13 @@ provenance:
   drive_file_id: 14OK-GDnThzmR94Qn1hsCL2b3wplbgUBH
   original_filename: "VCS Schema - Module - Ceiling with Limited Attic Storage.py"
   source: "https://wiki.opensourceecology.org/wiki/Catarina_Log"
+interface:
+  system: vcs12
+  role: ceiling
+  width_in: 155.0
+  depth_in: 144.0
+  height_in: 6.25
+  exterior_face: -y
 slots:
   icon: null
   fab_drawing: null

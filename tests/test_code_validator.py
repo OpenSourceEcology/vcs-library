@@ -13,6 +13,7 @@ CHECK_NAMES = [
     "param_admissibility",
     "compiler_contract",
     "meta_complete",
+    "interface_consistent",
 ]
 
 
@@ -51,7 +52,7 @@ def test_bad_entry_reports_expected_failures_and_keeps_independent_passes():
         "param_admissibility",
         "compiler_contract",
     }
-    assert passed == {"schema_data_only", "meta_complete"}
+    assert passed == {"schema_data_only", "meta_complete", "interface_consistent"}
 
 
 def test_schema_load_failure_marks_schema_dependent_checks_not_loadable(tmp_path):
