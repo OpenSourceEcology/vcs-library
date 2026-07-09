@@ -1,0 +1,15 @@
+envelope:
+  bbox_in:
+    x: 24
+    y: 12
+    z: 1.5
+  tolerance_in: 0.5
+solids:
+  min_count: 2
+overlap:
+  tolerance_in3: 0.01
+  allowed_contact: []
+params:
+  - key: width_in
+    min: 1
+    max: 200
