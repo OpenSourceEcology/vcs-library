@@ -38,12 +38,12 @@ def write_fab_drawing(entry, shapes: list[ShapeInfo], doc, out_path: Path) -> st
         _stamp_svg(out_path, "techdraw")
         return "techdraw"
     except Exception as exc:
-        fallback_svg = assemble_fallback_svg(entry, shapes, f"TechDraw unavailable: {exc}")
+        fallback_svg = assemble_fallback_svg(entry, shapes, diagnostics=f"TechDraw unavailable: {exc}")
         out_path.write_text(fallback_svg, encoding="utf-8")
         return "projection"
 
 
-def assemble_fallback_svg(entry, shapes: list[ShapeInfo], note: str = "") -> str:
+def assemble_fallback_svg(entry, shapes: list[ShapeInfo], note: str = "", diagnostics: str = "") -> str:
     exterior_face = entry.meta.get("interface", {}).get("exterior_face", "-y")
     front_axis = _projection_axis(exterior_face)
     side_axis = "x" if front_axis != "x" else "y"
@@ -60,12 +60,15 @@ def assemble_fallback_svg(entry, shapes: list[ShapeInfo], note: str = "") -> str
             "</g>",
             _render_dimensions(dims),
             _render_bom_table(bom_lines),
-            f'<text x="70" y="805" class="small">projection</text>',
-            f'<text x="180" y="805" class="small">{escape(note)}</text>' if note else "",
+            f'<text x="70" y="805" class="small">ORTHOGRAPHIC PROJECTION — NOT TO SCALE</text>',
+            f'<text x="380" y="805" class="small">{escape(note)}</text>' if note else "",
         ]
     )
     template = _template_text()
-    return template.replace("<!-- SLOT_GENERATION_PATH -->", "fab_drawing_path=projection").replace(
+    path_comment = "fab_drawing_path=projection"
+    if diagnostics:
+        path_comment += " " + escape(diagnostics)
+    return template.replace("<!-- SLOT_GENERATION_PATH -->", f"<!-- {path_comment} -->").replace(
         "<!-- FAB_CONTENT -->", body
     )
 
